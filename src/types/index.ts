@@ -1,5 +1,4 @@
 export interface RootSenseConfig {
-  dsn?: string;
   apiKey?: string;
   apiUrl?: string;
   projectId?: string;
@@ -26,7 +25,7 @@ export interface RootSenseConfig {
 export interface BaseEvent {
   event_id: string;
   timestamp: string; // ISO format datetime string
-  type: 'error' | 'message' | 'metric' | 'span';
+  type: "error" | "message" | "metric" | "span";
   environment: string;
   project_id: string;
   tags?: Record<string, unknown>;
@@ -37,7 +36,7 @@ export interface BaseEvent {
 
 // Error event structure (matching Python SDK)
 export interface ErrorEvent extends BaseEvent {
-  type: 'error';
+  type: "error";
   exception_type: string;
   message: string;
   stack_trace: string;
@@ -53,8 +52,8 @@ export interface ErrorEvent extends BaseEvent {
 
 // Message event structure (matching Python SDK)
 export interface MessageEvent extends BaseEvent {
-  type: 'message';
-  level: 'info' | 'warning' | 'error' | 'debug' | 'critical';
+  type: "message";
+  level: "info" | "warning" | "error" | "debug" | "critical";
   message: string;
   category?: string;
   logger?: string;
@@ -77,12 +76,12 @@ export interface MetricDataPoint {
 
 // Metric event structure (matching Python SDK)
 export interface MetricEvent extends BaseEvent {
-  type: 'metric';
+  type: "metric";
   metric_name: string;
   name?: string; // Alternative name field (used by OTel exporter)
   description?: string;
   unit?: string;
-  metric_type?: 'counter' | 'gauge' | 'histogram' | 'summary';
+  metric_type?: "counter" | "gauge" | "histogram" | "summary";
   sample_name?: string; // Full sample name with suffix
   labels?: Record<string, string>; // Prometheus-style labels
   value?: number; // Single value (Prometheus-style)
@@ -113,8 +112,8 @@ export interface SpanError {
 
 // Span event structure (matching Python SDK)
 export interface SpanEvent extends BaseEvent {
-  type: 'span';
-  operation_type: 'http' | 'db' | 'redis' | 'celery' | 'messaging' | 'generic';
+  type: "span";
+  operation_type: "http" | "db" | "redis" | "celery" | "messaging" | "generic";
   name: string;
   trace_id: string;
   span_id: string;
@@ -130,7 +129,11 @@ export interface SpanEvent extends BaseEvent {
 }
 
 // Union type for all event types
-export type RootSenseEvent = ErrorEvent | MessageEvent | MetricEvent | SpanEvent;
+export type RootSenseEvent =
+  | ErrorEvent
+  | MessageEvent
+  | MetricEvent
+  | SpanEvent;
 
 export interface RequestContext {
   method?: string;
@@ -156,10 +159,9 @@ export interface Breadcrumb {
   category: string;
   message: string;
   data?: Record<string, unknown>;
-  level?: 'info' | 'warning' | 'error' | 'debug';
+  level?: "info" | "warning" | "error" | "debug";
 }
 
 export interface BatchPayload {
   events: RootSenseEvent[];
 }
-

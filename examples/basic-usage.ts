@@ -1,17 +1,44 @@
 import { init } from "../src";
 
-// Initialize RootSense SDK
-const sdk = init({
-  // Option 1: Use DSN (recommended)
-  dsn: "https://YOUR_API_KEY@api.rootsense.ai/v1",
+/**
+ * Basic Usage Example with OpenTelemetry Auto-Instrumentation
+ *
+ * OpenTelemetry instrumentation is enabled by default when you initialize the SDK.
+ * It automatically tracks:
+ * - HTTP requests/responses
+ * - Database queries (PostgreSQL, MySQL, MongoDB)
+ * - Redis operations
+ * - Fetch API calls
+ * - Framework-specific operations (Express, Fastify, Koa, etc.)
+ *
+ * To use auto-instrumentation, install the required OpenTelemetry packages:
+ * npm install @opentelemetry/api @opentelemetry/sdk-trace-node @opentelemetry/sdk-trace-base @opentelemetry/sdk-metrics @opentelemetry/resources @opentelemetry/semantic-conventions @opentelemetry/instrumentation
+ *
+ * For specific framework instrumentation, install the corresponding package:
+ * - Express: @opentelemetry/instrumentation-express
+ * - Fastify: @opentelemetry/instrumentation-fastify
+ * - Koa: @opentelemetry/instrumentation-koa
+ * - PostgreSQL: @opentelemetry/instrumentation-pg
+ * - MySQL: @opentelemetry/instrumentation-mysql2
+ * - MongoDB: @opentelemetry/instrumentation-mongodb
+ * - Redis: @opentelemetry/instrumentation-redis
+ * - Fetch: @opentelemetry/instrumentation-fetch
+ */
 
-  // Option 2: Use separate API key and URL
-  // apiKey: 'YOUR_API_KEY',
-  // apiUrl: 'https://api.rootsense.ai/v1',
+// Initialize RootSense SDK with auto-instrumentation enabled (default)
+const sdk = init({
+  apiKey: "YOUR_API_KEY",
+  apiUrl: "https://api.rootsense.ai/v1",
+  projectId: "YOUR_PROJECT_ID", // Required
 
   serviceName: "my-service",
   environment: "production",
   version: "1.0.0",
+  projectId: "YOUR_PROJECT_ID", // Required for OpenTelemetry instrumentation
+
+  // OpenTelemetry auto-instrumentation is enabled by default
+  enableAutoInstrumentation: true, // Set to false to disable
+
   enableMetrics: true,
   enableErrorTracking: true,
   sanitizePII: true,

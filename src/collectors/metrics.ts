@@ -132,7 +132,7 @@ export class MetricsCollector {
     return this.register.metrics();
   }
 
-  async getMetricsAsJSON(): Promise<promClient.metric[]> {
+  async getMetricsAsJSON(): Promise<any[]> {
     return this.register.getMetricsAsJSON();
   }
 
