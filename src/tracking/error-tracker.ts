@@ -3,20 +3,14 @@ import {
   ErrorEvent,
   RequestContext,
   ResponseContext,
+  Breadcrumb,
 } from "../types";
 import { generateFingerprint, generateErrorId } from "../utils/fingerprint";
 import { sanitizeObject, sanitizeHeaders } from "../utils/pii";
 
 export class ErrorTracker {
   private config: Required<RootSenseConfig>;
-  private breadcrumbs: Array<{
-    timestamp: number;
-    type: string;
-    category: string;
-    message: string;
-    data?: Record<string, unknown>;
-    level?: string;
-  }> = [];
+  private breadcrumbs: Breadcrumb[] = [];
   private maxBreadcrumbs: number = 100;
 
   constructor(config: Required<RootSenseConfig>) {
@@ -39,22 +33,29 @@ export class ErrorTracker {
       endpoint
     );
 
+    const sanitizedContext = this.sanitizeContext(context);
+
     const errorEvent: ErrorEvent = {
-      id: generateErrorId(),
-      timestamp: Date.now(),
-      type: errorType,
+      event_id: generateErrorId(),
+      timestamp: new Date().toISOString(),
+      type: 'error',
+      exception_type: errorType,
       message: error.message,
-      stack: error.stack,
+      stack_trace: error.stack || '',
       fingerprint,
+      environment: this.config.environment,
+      project_id: this.config.projectId,
       service: this.config.serviceName,
       endpoint,
       method: context?.request?.method,
-      context: this.sanitizeContext(context),
+      status_code: context?.response?.statusCode,
       tags: {
         ...this.config.tags,
         environment: this.config.environment,
         version: this.config.version,
       },
+      extra: sanitizedContext,
+      breadcrumbs: this.breadcrumbs.length > 0 ? [...this.breadcrumbs] : undefined,
     };
 
     return errorEvent;
@@ -124,7 +125,7 @@ export class ErrorTracker {
     level: "info" | "warning" | "error" | "debug" = "info",
     data?: Record<string, unknown>
   ): void {
-    const breadcrumb = {
+    const breadcrumb: Breadcrumb = {
       timestamp: Date.now(),
       type: "log",
       category,
@@ -144,14 +145,7 @@ export class ErrorTracker {
     }
   }
 
-  getBreadcrumbs(): Array<{
-    timestamp: number;
-    type: string;
-    category: string;
-    message: string;
-    data?: Record<string, unknown>;
-    level?: string;
-  }> {
+  getBreadcrumbs(): Breadcrumb[] {
     return [...this.breadcrumbs];
   }
 

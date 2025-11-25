@@ -11,6 +11,7 @@ import { MetricsCollector } from "../collectors/metrics";
 import { BatchSender } from "../transport/batch-sender";
 import { WebSocketClient } from "../transport/websocket";
 import { ErrorTracker } from "../tracking/error-tracker";
+import { AutoInstrumentation } from "../instrumentation/auto";
 
 export class RootSenseSDK {
   private config: Required<RootSenseConfig>;
@@ -18,6 +19,7 @@ export class RootSenseSDK {
   private batchSender: BatchSender;
   private websocketClient: WebSocketClient;
   private errorTracker: ErrorTracker;
+  private autoInstrumentation?: AutoInstrumentation;
   private initialized: boolean = false;
 
   constructor(config: RootSenseConfig) {
@@ -26,6 +28,20 @@ export class RootSenseSDK {
     this.batchSender = new BatchSender(this.config, this.metricsCollector);
     this.websocketClient = new WebSocketClient(this.config);
     this.errorTracker = new ErrorTracker(this.config);
+
+    // Initialize auto-instrumentation if enabled
+    if (this.config.enableAutoInstrumentation) {
+      try {
+        this.autoInstrumentation = new AutoInstrumentation(
+          this.errorTracker,
+          this.batchSender,
+          this.config
+        );
+        this.autoInstrumentation.initialize();
+      } catch (error) {
+        console.warn("[RootSense] Auto-instrumentation not available:", error);
+      }
+    }
 
     // Setup global error handlers
     this.setupGlobalErrorHandlers();
@@ -135,6 +151,11 @@ export class RootSenseSDK {
   }
 
   async shutdown(): Promise<void> {
+    // Shutdown auto-instrumentation (await to ensure all telemetry is flushed)
+    if (this.autoInstrumentation) {
+      await this.autoInstrumentation.shutdown();
+    }
+
     await this.batchSender.shutdown();
     this.websocketClient.close();
   }

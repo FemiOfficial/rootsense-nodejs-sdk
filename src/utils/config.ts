@@ -1,6 +1,6 @@
 import { RootSenseConfig } from '../types';
 
-const DEFAULT_CONFIG: Required<Omit<RootSenseConfig, 'dsn' | 'apiKey' | 'apiUrl' | 'websocketUrl'>> = {
+const DEFAULT_CONFIG: Required<Omit<RootSenseConfig, 'dsn' | 'apiKey' | 'apiUrl' | 'websocketUrl' | 'projectId'>> = {
   serviceName: 'unknown-service',
   environment: 'production',
   version: '1.0.0',
@@ -10,6 +10,7 @@ const DEFAULT_CONFIG: Required<Omit<RootSenseConfig, 'dsn' | 'apiKey' | 'apiUrl'
   enableWebSocket: false,
   enableMetrics: true,
   enableErrorTracking: true,
+  enableAutoInstrumentation: true,
   sanitizePII: true,
   piiFields: ['password', 'token', 'authorization', 'apiKey', 'secret', 'ssn', 'creditCard', 'email'],
   retryAttempts: 3,
@@ -33,18 +34,25 @@ export function parseDSN(dsn: string): { apiKey: string; apiUrl: string } {
 export function normalizeConfig(config: RootSenseConfig): Required<RootSenseConfig> {
   let apiKey: string;
   let apiUrl: string;
+  let projectId: string;
 
   if (config.dsn) {
     const parsed = parseDSN(config.dsn);
     apiKey = parsed.apiKey;
     apiUrl = parsed.apiUrl;
   } else {
-    apiKey = config.apiKey || '';
-    apiUrl = config.apiUrl || 'https://api.rootsense.ai/v1';
+    apiKey = config.apiKey || process.env.ROOTSENSE_API_KEY || '';
+    apiUrl = config.apiUrl || process.env.ROOTSENSE_API_URL || 'https://api.rootsense.ai';
   }
 
+  projectId = config.projectId || process.env.ROOTSENSE_PROJECT_ID || '';
+
   if (!apiKey) {
-    throw new Error('API key is required. Provide either dsn or apiKey in config.');
+    throw new Error('API key is required. Provide either dsn or apiKey in config, or set ROOTSENSE_API_KEY environment variable.');
+  }
+
+  if (!projectId) {
+    throw new Error('Project ID is required. Provide projectId in config or set ROOTSENSE_PROJECT_ID environment variable.');
   }
 
   return {
@@ -52,6 +60,7 @@ export function normalizeConfig(config: RootSenseConfig): Required<RootSenseConf
     ...config,
     apiKey,
     apiUrl,
+    projectId,
     websocketUrl: config.websocketUrl || apiUrl.replace(/^https?/, 'ws'),
     serviceName: config.serviceName || DEFAULT_CONFIG.serviceName,
   };

@@ -43,10 +43,38 @@
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "express": "^4.0.0 || ^5.0.0"
+    "express": "^4.0.0 || ^5.0.0",
+    "@opentelemetry/api": "^1.7.0",
+    "@opentelemetry/sdk-trace-node": "^1.20.0",
+    "@opentelemetry/sdk-trace-base": "^1.20.0",
+    "@opentelemetry/sdk-metrics": "^1.20.0",
+    "@opentelemetry/resources": "^1.20.0",
+    "@opentelemetry/semantic-conventions": "^1.20.0",
+    "@opentelemetry/instrumentation": "^0.48.0"
   },
   "peerDependenciesMeta": {
     "express": {
+      "optional": true
+    },
+    "@opentelemetry/api": {
+      "optional": true
+    },
+    "@opentelemetry/sdk-trace-node": {
+      "optional": true
+    },
+    "@opentelemetry/sdk-trace-base": {
+      "optional": true
+    },
+    "@opentelemetry/sdk-metrics": {
+      "optional": true
+    },
+    "@opentelemetry/resources": {
+      "optional": true
+    },
+    "@opentelemetry/semantic-conventions": {
+      "optional": true
+    },
+    "@opentelemetry/instrumentation": {
       "optional": true
     }
   },

@@ -13,10 +13,17 @@ export { nextjsMiddleware } from "./middleware/nextjs";
 export { ErrorTracker } from "./tracking/error-tracker";
 export { MetricsCollector } from "./collectors/metrics";
 
+// Instrumentation
+export { AutoInstrumentation } from "./instrumentation/auto";
+export { RootSenseSpanExporter, RootSenseMetricExporter } from "./instrumentation/exporters";
+
 // Types
 export type {
   ErrorEvent,
+  MessageEvent,
   MetricEvent,
+  SpanEvent,
+  RootSenseEvent,
   RequestContext,
   ResponseContext,
   Breadcrumb,

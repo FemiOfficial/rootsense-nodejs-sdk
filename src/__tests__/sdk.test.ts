@@ -6,6 +6,7 @@ describe('RootSenseSDK', () => {
   const mockConfig: RootSenseConfig = {
     apiKey: 'test-api-key',
     apiUrl: 'https://api.rootsense.ai/v1',
+    projectId: 'test-project',
     serviceName: 'test-service',
     environment: 'test',
     enableMetrics: true,
@@ -31,13 +32,14 @@ describe('RootSenseSDK', () => {
       }).toThrow('API key is required');
     });
 
-    it('should parse DSN correctly', () => {
+    it('should parse DSN correctly', async () => {
       const sdkWithDSN = init({
         dsn: 'https://test-key@api.rootsense.ai/v1',
         serviceName: 'test',
+        projectId: 'test-project',
       });
       expect(sdkWithDSN.isInitialized()).toBe(true);
-      sdkWithDSN.shutdown();
+      await sdkWithDSN.shutdown();
     });
   });
 
